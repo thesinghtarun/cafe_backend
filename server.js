@@ -3,7 +3,7 @@ const cors=require('cors');
 const chalk=require('chalk');
 const mongoose=require('mongoose');
 const express=require('express');
-const { addTable, getTables, getItems } = require('./controller/app_controller');
+const { addTable, getTables, getItems, addItem } = require('./controller/app_controller');
 const app=express();
 
 app.use(express.json());
@@ -22,6 +22,7 @@ mongoose.connect(mongo)
 //ROUTES
 app.post(`${baseUrl}table`,addTable);
 app.get(`${baseUrl}table`,getTables);
+app.post(`${baseUrl}item`,addItem);
 app.get(`${baseUrl}item`,getItems);
 
 
