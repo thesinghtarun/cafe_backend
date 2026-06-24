@@ -1,4 +1,5 @@
-import {TABLE} from "../models/tables.models.js";
+import { ITEM } from "../models/items.model.js";
+import {TABLE} from "../models/tables.model.js";
 
 
 
@@ -31,6 +32,19 @@ export const getTables=async(req,res)=>{
         console.log(e);
         return res.status(500).json({msg:`Server Error: ${e}`});
         
+    }
+}
+
+//GET ITEMS
+export const getItems=async(req,res)=>{
+    try {
+        const item=await ITEM.find();
+        if(!item)
+            return res.status(404).json({msg:"No item found"});
+        return res.status.json({msg:"Item found",item});
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({msg:`Server Error: ${e}`});
     }
 }
 
