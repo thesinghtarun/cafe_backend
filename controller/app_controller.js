@@ -41,7 +41,7 @@ export const getItems=async(req,res)=>{
         const item=await ITEM.find();
         if(!item)
             return res.status(404).json({msg:"No item found"});
-        return res.status.json({msg:"Item found",item});
+        return res.status(200).json({msg:"Item found",item});
     } catch (e) {
         console.log(e);
         return res.status(500).json({msg:`Server Error: ${e}`});
