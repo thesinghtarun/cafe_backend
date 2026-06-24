@@ -3,8 +3,27 @@ const mongoose=require('mongoose');
 
 const tableSchema=new mongoose.Schema({
 
-    table_no:{type:Number,required:true,unique:true},
-    is_occupued:{type:Boolean,default:false}
+    table_no:{
+        type:Number,
+        required:true,
+        unique:true
+    },
+
+    status: {
+        type: String,
+        enum: ["available", "reserved", "occupied"],
+        default: "available",
+  },
+
+    reserved_by: {
+        type: String,
+        default: null,
+    },
+
+    reserved_until: {
+        type: Date,
+        default: null,
+    }
 
 },{timestamps:true});
 
