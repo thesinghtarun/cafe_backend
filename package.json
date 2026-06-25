@@ -12,7 +12,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.7.2"
+    "mongoose": "^9.7.2",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "chalk": "^3.0.0",

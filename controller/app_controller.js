@@ -1,6 +1,7 @@
 import { ITEM } from "../models/items.model.js";
+import { SESSION } from "../models/session.model.js";
 import { TABLE } from "../models/tables.model.js";
-
+import { v4 as uuidv4, v4 } from "uuid";
 
 
 //ADD TABLE
@@ -33,6 +34,55 @@ export const getTables = async (req, res) => {
 
     }
 }
+
+//GET TABLE INFO
+export const scanTable = async (req, res) => {
+  try {
+    const { tableNo } = req.params;
+
+    // 1. check table exists
+    const table = await TABLE.findOne({ table_no: tableNo });
+
+    if (!table) {
+      return res.status(404).json({ msg: "Table not found" });
+    }
+
+    // 2. check active session already exists
+    const existingSession = await SESSION.findOne({
+      table_no: tableNo,
+      status: "active",
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (existingSession) {
+      return res.status(200).json({
+        msg: "Existing session",
+        sessionId: existingSession.sessionId,
+        tableNo,
+      });
+    }
+
+    // 3. create new session
+    const sessionId = uuidv4();
+
+    const session = await SESSION.create({
+      sessionId,
+      table_no: tableNo,
+      status: "active",
+      lastActivity: new Date(),
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 min
+    });
+
+    return res.status(200).json({
+      msg: "New session created",
+      sessionId: session.sessionId,
+      tableNo,
+    });
+
+  } catch (e) {
+    return res.status(500).json({ msg: e.message });
+  }
+};
 
 //POST ITEM
 export const addItem = async (req, res) => {
@@ -68,7 +118,4 @@ export const getItems = async (req, res) => {
         return res.status(500).json({ msg: `Server Error: ${e}` });
     }
 }
-
-
-
 

@@ -30,3 +30,8 @@ const tableSchema=new mongoose.Schema({
 const TABLE=mongoose.model("TABLE",tableSchema);
 
 module.exports={TABLE};
+
+
+// QR DESIGN
+// https://your-backend.com/cafe/table/1
+// https://your-backend.com/cafe/table/2
