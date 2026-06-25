@@ -38,45 +38,98 @@ export const getTables = async (req, res) => {
 //GET TABLE INFO
 export const scanTable = async (req, res) => {
   try {
-    const { tableNo } = req.params;
+    const { tableNo } = req.body;
 
-    // 1. check table exists
+    // =========================
+    // 1. Validate input
+    // =========================
+    if (!tableNo) {
+      return res.status(400).json({
+        success: false,
+        msg: "Table number required",
+      });
+    }
+
+    // =========================
+    // 2. Check table exists
+    // =========================
     const table = await TABLE.findOne({ table_no: tableNo });
 
     if (!table) {
-      return res.status(404).json({ msg: "Table not found" });
+      return res.status(404).json({
+        success: false,
+        msg: "Table not found",
+      });
     }
 
-    // 2. check active session already exists
-    const existingSession = await SESSION.findOne({
+    // =========================
+    // 3. Check existing active session
+    // =========================
+    let session = await SESSION.findOne({
       table_no: tableNo,
       status: "active",
       expiresAt: { $gt: new Date() },
     });
 
-    if (existingSession) {
+    // =========================
+    // 4. If session exists → return it
+    // =========================
+    if (session) {
       return res.status(200).json({
+        success: true,
         msg: "Existing session",
-        sessionId: existingSession.sessionId,
+        sessionId: session.sessionId,
         tableNo,
+        expiresAt: session.expiresAt,
       });
     }
 
-    // 3. create new session
+    // =========================
+    // 5. Create new session
+    // =========================
     const sessionId = uuidv4();
+    const now = new Date();
 
-    const session = await SESSION.create({
+    session = await SESSION.create({
       sessionId,
       table_no: tableNo,
       status: "active",
-      lastActivity: new Date(),
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 min
+      lastActivity: now,
+      expiresAt: new Date(now.getTime() + 15 * 60 * 1000), // 15 min
     });
 
+    // =========================
+    // 6. Response
+    // =========================
     return res.status(200).json({
+      success: true,
       msg: "New session created",
       sessionId: session.sessionId,
       tableNo,
+      expiresAt: session.expiresAt,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      msg: error.message,
+    });
+  }
+};
+
+//UPADTE USER ACTIVITY
+export const updateActivity = async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+
+    await SESSION.updateOne(
+      { sessionId },
+      { lastActivity: new Date() }
+    );
+
+    return res.status(200).json({
+      success: true,
+      msg: "Activity updated",
     });
 
   } catch (e) {

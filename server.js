@@ -3,7 +3,7 @@ const cors=require('cors');
 const chalk=require('chalk');
 const mongoose=require('mongoose');
 const express=require('express');
-const { addTable, getTables, getItems, addItem, scanTable } = require('./controller/app_controller');
+const { addTable, getTables, getItems, addItem, scanTable, updateActivity } = require('./controller/app_controller');
 const app=express();
 
 app.use(express.json());
@@ -20,11 +20,13 @@ mongoose.connect(mongo)
 
 
 //ROUTES
-app.post(`${baseUrl}table`,addTable);
-app.get(`${baseUrl}table`,getTables);
-app.get(`${baseUrl}table/:tableNo`, scanTable);
-app.post(`${baseUrl}item`,addItem);
-app.get(`${baseUrl}item`,getItems);
+app.post(`${baseUrl}/table`,addTable);
+app.get(`${baseUrl}/table`,getTables);
+app.post(`${baseUrl}/table/scan`, scanTable);
+//VERY IMPORTANT
+app.post(`${baseUrl}/user/active`,updateActivity);
+app.post(`${baseUrl}/item`,addItem);
+app.get(`${baseUrl}/item`,getItems);
 
 
 app.listen(port,()=>console.log(chalk.green(`Running on port ${port}`)))
